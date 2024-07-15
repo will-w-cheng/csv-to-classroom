@@ -7,6 +7,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from datetime import datetime
 import pytz
+import argparse
 
 
 # If modifying these scopes, delete the file token.json.
@@ -15,13 +16,7 @@ SCOPES = ["https://www.googleapis.com/auth/classroom.coursework.students",
 ]
 
 
-def create_classwork(course_id, creds):
-
-  """
-  Prase the csv file
-  """
-
-
+def create_classwork(course_id, creds, csv_file_path):
 
   """
   Creates the coursework the user has access to.
@@ -36,7 +31,7 @@ def create_classwork(course_id, creds):
     Prasing the CSV file
     """
     
-    with open('test.csv', 'r') as csv_file:
+    with open(csv_file_path, 'r') as csv_file:
       reader = csv.reader(csv_file)
       
       #Skip the first line cause it's just the field names
@@ -92,9 +87,14 @@ def create_classwork(course_id, creds):
 
 
 def main():
-  """Shows basic usage of the Classroom API.
-  Prints the names of the first 10 courses the user has access to.
   """
+
+  Take the CSV file as an argument. 
+  """
+  parser = argparse.ArgumentParser(description='Create coursework for a Google Classroom course.')
+  parser.add_argument('csv_file', type=str, help='The path to the CSV file containing coursework details')
+  args = parser.parse_args()
+
   creds = None
   # The file token.json stores the user's access and refresh tokens, and is
   # created automatically when the authorization flow completes for the first
@@ -114,7 +114,7 @@ def main():
     with open("token.json", "w") as token:
       token.write(creds.to_json())
 
-  create_classwork(691448665311, creds)
+  create_classwork(691448665311, creds, args.csv_file)
 
 
 

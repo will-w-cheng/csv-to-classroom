@@ -9,12 +9,11 @@ from datetime import datetime
 import pytz
 import argparse
 
-
 # If modifying these scopes, delete the file token.json.
-SCOPES = ["https://www.googleapis.com/auth/classroom.coursework.students",
-    "https://www.googleapis.com/auth/classroom.coursework.me"
+SCOPES = ["https://www.googleapis.com/auth/classroom.coursework.students"
+    , "https://www.googleapis.com/auth/classroom.coursework.me"
+    , "https://www.googleapis.com/auth/classroom.courses.readonly"
 ]
-
 
 def create_classwork(course_id, creds, csv_file_path):
 
@@ -28,7 +27,7 @@ def create_classwork(course_id, creds, csv_file_path):
     service = build("classroom", "v1", credentials=creds)
 
     """
-    Prasing the CSV file
+    Parsing the CSV file
     """
     
     with open(csv_file_path, 'r') as csv_file:
@@ -89,32 +88,16 @@ def create_classwork(course_id, creds, csv_file_path):
 def main():
   """
 
-  Take the CSV file as an argument. 
+  Take the course ID as an argument. 
   """
-  parser = argparse.ArgumentParser(description='Create coursework for a Google Classroom course.')
-  parser.add_argument('csv_file', type=str, help='The path to the CSV file containing coursework details')
+  parser = argparse.ArgumentParser(description='Create assignments for a Google Classroom course.')
+  parser.add_argument('course_id', type=str, help='The course ID where to create assignments')
+  parser.add_argument('csv_file', type=str, help='The path to the CSV file containing assignment details')
   args = parser.parse_args()
 
-  creds = None
-  # The file token.json stores the user's access and refresh tokens, and is
-  # created automatically when the authorization flow completes for the first
-  # time.
-  if os.path.exists("token.json"):
-    creds = Credentials.from_authorized_user_file("token.json", SCOPES)
-  # If there are no (valid) credentials available, let the user log in.
-  if not creds or not creds.valid:
-    if creds and creds.expired and creds.refresh_token:
-      creds.refresh(Request())
-    else:
-      flow = InstalledAppFlow.from_client_secrets_file(
-          "credentials.json", SCOPES
-      )
-      creds = flow.run_local_server(port=0)
-    # Save the credentials for the next run
-    with open("token.json", "w") as token:
-      token.write(creds.to_json())
+  creds = Credentials.from_authorized_user_file("token.json", SCOPES)
 
-  create_classwork(691448665311, creds, args.csv_file)
+  create_classwork(args.course_id, creds, args.csv_file)
 
 
 
